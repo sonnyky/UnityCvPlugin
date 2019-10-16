@@ -6,9 +6,14 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E0346311234B20EB00DCDC34 /* OpenCVPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E0346310234B20EB00DCDC34 /* OpenCVPlugin.cpp */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E0346307234B1ABC00DCDC34 /* UnityCvPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnityCvPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		E034630A234B1ABC00DCDC34 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E0346310234B20EB00DCDC34 /* OpenCVPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenCVPlugin.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -25,6 +30,7 @@
 		E03462FE234B1ABC00DCDC34 = {
 			isa = PBXGroup;
 			children = (
+				E0346310234B20EB00DCDC34 /* OpenCVPlugin.cpp */,
 				E0346309234B1ABC00DCDC34 /* UnityCvPlugin */,
 				E0346308234B1ABC00DCDC34 /* Products */,
 			);
@@ -114,6 +120,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E0346311234B20EB00DCDC34 /* OpenCVPlugin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,8 +221,18 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = Q7532HPHDA;
+				HEADER_SEARCH_PATHS = /usr/local/include/opencv4;
 				INFOPLIST_FILE = UnityCvPlugin/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-lopencv_imgproc",
+					"-lopencv_core",
+					"-lopencv_imgcodecs",
+					"-lopencv_photo",
+					"-lopencv_xfeatures2d",
+					"-lopencv_features2d",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = tinker.UnityCvPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -228,8 +245,18 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = Q7532HPHDA;
+				HEADER_SEARCH_PATHS = /usr/local/include/opencv4;
 				INFOPLIST_FILE = UnityCvPlugin/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-lopencv_imgproc",
+					"-lopencv_core",
+					"-lopencv_imgcodecs",
+					"-lopencv_photo",
+					"-lopencv_xfeatures2d",
+					"-lopencv_features2d",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = tinker.UnityCvPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -256,6 +283,7 @@
 				E034630F234B1ABC00DCDC34 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
