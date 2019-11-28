@@ -22,14 +22,14 @@ using namespace cv;
 using namespace std;
 
 extern "C" {
-    int TestFunction_Internal();
+    int _TestFunction_Internal();
     void _SaveBlackAndWhite(unsigned char * bytes, int rows, int cols, int type);
     float _TestGetImageShapeSimilarity();
     float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols, int type);
     float _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols, int type);
 }
 
-int TestFunction_Internal() {
+int _TestFunction_Internal() {
     return 12345;
 }
 
@@ -97,7 +97,7 @@ float AddCompareSimilarityWithFeatures(Mat refImg, Mat imgToCompare){
         }
     }
     
-    return 0;
+    return (float) goodMatches;
 }
 
 
@@ -126,6 +126,7 @@ float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCo
     double res = matchShapes(grayRefImg,grayToCompare,CONTOURS_MATCH_I2,0);
     auto resF = static_cast<float>(res);
     
+    // Specify type to add more reliability with feature detection. Runtime will be severely impacted.
     if(resF > 0.0001 && resF < 0.001 && type == 2){
         resF = AddCompareSimilarityWithFeatures(refImg, imgToCompare);
     }
