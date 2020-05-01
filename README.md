@@ -7,7 +7,7 @@ The accompanying repository for the Unity side is [here](https://github.com/sonn
 Takes a Unity Texture2D object and saves it as a black and white jpg.
 
 ### Image transformation
-Takes a Unity Texture2D and rotates, scales and translates its ROI (Region of Interest) on top of a new image.
+Takes a Unity Texture2D and rotates, scales and translates its ROI (Region of Interest) on top of a new image. The image's outer hull is first detected and an ROI is set. Scaling and rotation is done only on this ROI area. After rotation and scaling, the ROI is overlaid on a new image with the same size as the original, at a specified offset. Please see code for more details.
 
 ### Detect outer hull
 Detects the outer points of an image, useful to determine ROI and other computer vision pipelines.
