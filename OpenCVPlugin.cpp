@@ -25,7 +25,7 @@ extern "C" {
     void _SaveBlackAndWhite(unsigned char * bytes, int rows, int cols);
     void _DetectOuterHull(unsigned char * bytes, int rows, int cols);
     float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols);
-    void _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols);
+    int _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rowsRef, int colsRef, int rowsCmp, int colsCmp);
     void _TransformImage(unsigned char * original, unsigned char * target
     , int rows, int cols,
     float rotateAngle = 0, float scale = 1, int transX = 0, int transY = 0);
@@ -244,13 +244,13 @@ float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCo
 }
 
 
-void _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols){
+int _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rowsRef, int colsRef, int rowsCmp, int colsCmp){
     // Create opencv images from the bytes
-    Mat refImg(rows, cols, CV_8UC4);
-    memcpy(refImg.data, bytesRef, rows * cols * 4);
+    Mat refImg(rowsRef, colsRef, CV_8UC4);
+    memcpy(refImg.data, bytesRef, rowsRef * colsRef * 4);
     
-    Mat imgToCompare(rows, cols, CV_8UC4);
-    memcpy(imgToCompare.data, toCompare, rows * cols * 4);
+    Mat imgToCompare(rowsCmp, colsCmp, CV_8UC4);
+    memcpy(imgToCompare.data, toCompare, rowsCmp * colsCmp * 4);
     
     std::vector<cv::KeyPoint> detectedKeypoints;
     cv::Mat objectDescriptors;
@@ -261,6 +261,14 @@ void _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * to
     std::vector<KeyPoint> keypoints_1, keypoints_2;
     f2d->detect( refImg, keypoints_1 );
     f2d->detect( imgToCompare, keypoints_2 );
+    
+    Mat refSiftPoints;
+    drawKeypoints(refImg, keypoints_1, refSiftPoints);
+    imwrite("ref.jpg", refSiftPoints);
+    
+    Mat cmpSiftPoints;
+    drawKeypoints(imgToCompare, keypoints_2, cmpSiftPoints);
+    imwrite("cmp.jpg", cmpSiftPoints);
     
     //-- Step 2: Calculate descriptors (feature vectors)
     Mat descriptors_1, descriptors_2;
@@ -286,4 +294,9 @@ void _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * to
     Mat img_matches;
     drawMatches( refImg, keypoints_1, imgToCompare, keypoints_2, good_matches, img_matches, Scalar::all(-1),
                 Scalar::all(-1), std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+    cvtColor(img_matches, img_matches, COLOR_RGBA2BGRA);
+    
+    flip(img_matches, img_matches, 0);
+    imwrite("matches.jpg", img_matches);
+    return good_matches.size();
 }
