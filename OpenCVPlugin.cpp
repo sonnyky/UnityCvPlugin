@@ -22,29 +22,16 @@ using namespace cv;
 using namespace std;
 
 extern "C" {
-    int _TestFunction_Internal();
-    void _SaveBlackAndWhite(unsigned char * bytes, int rows, int cols, int type);
-    void _DetectOuterHull(unsigned char * bytes, int rows, int cols, int type);
-    float _TestGetImageShapeSimilarity();
-    float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols, int type);
-    float _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols, int type);
+    void _SaveBlackAndWhite(unsigned char * bytes, int rows, int cols);
+    void _DetectOuterHull(unsigned char * bytes, int rows, int cols);
+    float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols);
+    void _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols);
     void _TransformImage(unsigned char * original, unsigned char * target
     , int rows, int cols,
     float rotateAngle = 0, float scale = 1, int transX = 0, int transY = 0);
 }
 
-int _TestFunction_Internal() {
-    return 12345;
-}
-
-float _TestGetImageShapeSimilarity(){
-    
-    float res = 0.52f;
-    
-    return res;
-}
-
-void _SaveBlackAndWhite(unsigned char * bytes, int rows, int cols, int type){
+void _SaveBlackAndWhite(unsigned char * bytes, int rows, int cols){
     
     Mat img(rows, cols, CV_8UC4);
     memcpy(img.data, bytes, rows * cols * 4);
@@ -168,7 +155,7 @@ vector<Point> contoursConvexHull( vector<vector<Point> > contours )
     return result;
 }
 
-void _DetectOuterHull(unsigned char * bytes, int rows, int cols, int type){
+void _DetectOuterHull(unsigned char * bytes, int rows, int cols){
     int dilation_elem = 0;
     int dilation_size = 5;
     
@@ -228,45 +215,7 @@ void _DetectOuterHull(unsigned char * bytes, int rows, int cols, int type){
     imwrite("contours.jpg", drawing);
 }
 
-
-
-float AddCompareSimilarityWithFeatures(Mat refImg, Mat imgToCompare){
-    
-    std::vector<cv::KeyPoint> detectedKeypoints;
-    cv::Mat objectDescriptors;
-    
-    // Extract data
-    cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create();
-    //-- Step 1: Detect the keypoints:
-    std::vector<KeyPoint> keypoints_1, keypoints_2;
-    f2d->detect( refImg, keypoints_1 );
-    f2d->detect( imgToCompare, keypoints_2 );
-    
-    //-- Step 2: Calculate descriptors (feature vectors)
-    Mat descriptors_1, descriptors_2;
-    f2d->compute( refImg, keypoints_1, descriptors_1 );
-    f2d->compute( imgToCompare, keypoints_2, descriptors_2 );
-    
-    // Since SURF is a floating-point descriptor NORM_L2 is used
-    Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create(DescriptorMatcher::FLANNBASED);
-    std::vector< std::vector<DMatch> > knn_matches;
-    matcher->knnMatch( descriptors_1, descriptors_2, knn_matches, 2 );
-    //-- Filter matches using the Lowe's ratio test
-    const float ratio_thresh = 0.3f;
-    int goodMatches = 0;
-    for (size_t i = 0; i < knn_matches.size(); i++)
-    {
-        if (knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance)
-        {
-            goodMatches++;
-        }
-    }
-    
-    return (float) goodMatches;
-}
-
-
-float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols, int type){
+float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols){
     
     
     // Create opencv images from the bytes
@@ -291,16 +240,11 @@ float _CompareStructureSimilarity(unsigned char * bytesRef, unsigned char * toCo
     double res = matchShapes(grayRefImg,grayToCompare,CONTOURS_MATCH_I2,0);
     auto resF = static_cast<float>(res);
     
-    // Specify type to add more reliability with feature detection. Runtime will be severely impacted.
-    if(resF > 0.0001 && resF < 0.001 && type == 2){
-        resF = AddCompareSimilarityWithFeatures(refImg, imgToCompare);
-    }
-    
     return resF;
 }
 
 
-float _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols, int type){
+void _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * toCompare, int rows, int cols){
     // Create opencv images from the bytes
     Mat refImg(rows, cols, CV_8UC4);
     memcpy(refImg.data, bytesRef, rows * cols * 4);
@@ -342,7 +286,4 @@ float _CompareSimilarityWithFeatures(unsigned char * bytesRef, unsigned char * t
     Mat img_matches;
     drawMatches( refImg, keypoints_1, imgToCompare, keypoints_2, good_matches, img_matches, Scalar::all(-1),
                 Scalar::all(-1), std::vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-    
-    // Just return something as dummy
-    return 0;
 }
